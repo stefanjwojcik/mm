@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from math import pi
 
-df = pd.read_csv('../input/NCAATourneyDetailedResults.csv')
+df = pd.read_csv('DataFiles/NCAATourneyDetailedResults.csv')
 
 #Points Winning/Losing Team
 df['WPts'] = df.apply(lambda row: 2*row.WFGM + row.WFGM3 + row.WFTM, axis=1)
