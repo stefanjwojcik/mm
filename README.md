@@ -7,5 +7,5 @@
 ##### To Do:
 
 - Build basic pipeline (add sub-bullets accordingly)
-- Collect ideas
+- Test whether predicting cdf of scores produces better outcome than just plain probs
 - Test ideas
