@@ -14,6 +14,26 @@ def py_sum(A):
     for a in A:
         s += a
     return s
+
+def seed_to_int(seed):
+    #Get just the digits from the seeding. Return as int
+    s_int = int(seed[1:3])
+    return s_int
+#df_seeds['seed_int'] = df_seeds.Seed.apply(seed_to_int)
+#df_seeds.drop(labels=['Seed'], inplace=True, axis=1) # This is the string label    
+"""
+
+py"""
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+from sklearn.linear_model import LogisticRegression
+import matplotlib.pyplot as plt
+from sklearn.utils import shuffle
+from sklearn.model_selection import GridSearchCV
+
+data_dir = '../input/'
+df_seeds = pd.read_csv(data_dir + 'datafiles/NCAATourneySeeds.csv')
+df_tour = pd.read_csv(data_dir + 'datafiles/NCAATourneyCompactResults.csv')
 """
 
 sum_py = py"py_sum"

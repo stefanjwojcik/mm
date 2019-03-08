@@ -1,14 +1,17 @@
-# THE GOAL OF THIS: BASIC OUTCOME
+# THE GOAL OF THIS: COMPARE USING THE CDF AS THE OUTCOME COMPARED TO THE BINARY
 
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import log_loss
 import matplotlib.pyplot as plt
 from sklearn.utils import shuffle
 from sklearn.model_selection import GridSearchCV
 from scipy import stats
+from scipy.stats import norm
 
-#data_dir = '../input/'
+data_dir = '/Users/electron/Documents/mm/notebooks/data'
 df_seeds = pd.read_csv('DataFiles/NCAATourneySeeds.csv')
 df_tour = pd.read_csv('DataFiles/NCAATourneyCompactResults.csv')
 
@@ -46,31 +49,34 @@ df_losses['Result'] = 0
 
 ########
 df_predictions = pd.concat((df_wins, df_losses))
-df_predictions['point_cdf_'] = norm.cdf(df_predictions.point_cdf, scale = 10)
+df_predictions['point_cdf_'] = norm.cdf(df_predictions.point_cdf, scale = 5000)
 
 # BASELINE MODEL
 X_train = df_predictions.SeedDiff.values.reshape(-1,1)
-y_train = df_predictions.Result.values
-X_train, y_train = shuffle(X_train, y_train)
+y_train = df_predictions.point_cdf_.values
+y_train_bin = df_predictions.Result.values
+X_train, y_train, y_train_bin = shuffle(X_train, y_train, y_train_bin)
+
+#logreg = LogisticRegression()
+#params = {'C': np.logspace(start=-5, stop=3, num=9)}
+#clf = GridSearchCV(logreg, params, scoring='neg_log_loss', refit=True)
+#clf.fit(X_train, y_train_bin)
 
 logreg = LogisticRegression()
-params = {'C': np.logspace(start=-5, stop=3, num=9)}
-clf = GridSearchCV(logreg, params, scoring='neg_log_loss', refit=True)
-clf.fit(X_train, y_train)
+logreg = logreg.fit(X_train, y_train_bin)
+preds = [ [x[0], 1-x[0]] for x in logreg.predict_proba(X_train)]
+y = [x for x in y_train_bin]
+log_loss(y_true = y, y_pred = preds)
 
-X = np.arange(-10, 10).reshape(-1, 1)
-preds = clf.predict_proba(X)[:,1]
+# ALTERNATIVE MODEL: LINEAR MODEL
 
-
-# ALTERNATIVE MODEL
-X_train = df_predictions.SeedDiff.values.reshape(-1,1)
-y_train = df_predictions.point_cdf_.values
-X_train, y_train = shuffle(X_train, y_train)
-
+# make a linear model, then use the predictions in a logit
 linreg = LinearRegression()
-params = {'C': np.logspace(start=-5, stop=3, num=9)}
-clf = GridSearchCV(logreg, params, scoring='neg_log_loss', refit=True)
-clf.fit(X_train, y_train)
+linreg = linreg.fit(X_train, y_train)
+linpreds = norm.cdf(linreg.predict(X_train), scale = 100)
+preds = [ [x, 1-x] for x in linpreds]
+y = [x for x in y_train_bin]
+log_loss(y_true = y, y_pred = preds)
 
 #########
 
